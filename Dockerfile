@@ -1,26 +1,10 @@
-FROM ubuntu:18.04
-ARG BDS_Version="latest"
+FROM ubuntu:bionic
 
-ENV VERSION=$BDS_Version
-
-# Install dependencies
-RUN apt-get update && \
-    apt-get install -y unzip curl libcurl4 libssl1.0.0 && \
-    rm -rf /var/lib/apt/lists/*
-
-# Download and extract the bedrock server
-RUN if [ "$VERSION" = "latest" ] ; then \
-        LATEST_VERSION=$( \
-            curl -v --silent  https://www.minecraft.net/en-us/download/server/bedrock/ 2>&1 | \
-            grep -o 'https://minecraft.azureedge.net/bin-linux/[^"]*' | \
-            sed 's#.*/bedrock-server-##' | sed 's/.zip//') && \
-        export VERSION=$LATEST_VERSION && \
-        echo "Setting VERSION to $LATEST_VERSION" ; \
-    else echo "Using VERSION of $VERSION"; \
-    fi && \
-    curl https://minecraft.azureedge.net/bin-linux/bedrock-server-${VERSION}.zip --output bedrock-server.zip && \
-    unzip bedrock-server.zip -d bedrock-server && \
-    rm bedrock-server.zip
+RUN apt-get update
+RUN apt-get install -y unzip curl libcurl4 libssl1.0.0
+RUN curl https://minecraft.azureedge.net/bin-linux/bedrock-server-1.16.40.02.zip --output bedrock-server.zip
+RUN unzip bedrock-server.zip -d bedrock-server
+RUN rm bedrock-server.zip
 
 # Create a separate folder for configurations move the original files there and create links for the files
 RUN mkdir /bedrock-server/config && \
